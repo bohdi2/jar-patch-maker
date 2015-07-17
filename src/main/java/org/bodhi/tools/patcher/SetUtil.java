@@ -1,5 +1,5 @@
 
-package ebs.tools.patcher;
+package org.bodhi.tools.patcher;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,5 +1,5 @@
 
-package ebs.tools.patcher;
+package org.bodhi.tools.patcher;
 
 import java.io.InputStream;
 import java.security.DigestInputStream;

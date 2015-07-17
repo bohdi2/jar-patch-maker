@@ -1,4 +1,4 @@
-package ebs.tools.patcher;
+package org.bodhi.tools.patcher;
 
 import static java.util.jar.Attributes.Name.*;
 

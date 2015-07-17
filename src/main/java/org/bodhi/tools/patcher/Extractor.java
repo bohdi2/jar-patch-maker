@@ -1,4 +1,4 @@
-package ebs.tools.patcher;
+package org.bodhi.tools.patcher;
 
 import java.io.File;
 import java.util.ArrayList;
