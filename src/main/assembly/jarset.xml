@@ -1,0 +1,32 @@
+<assembly>
+  <id>jarset</id>
+
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>src/main/bin</directory>
+      <outputDirectory>/bin</outputDirectory>
+      <fileMode>755</fileMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>src/main/install</directory>
+      <outputDirectory>/install</outputDirectory>
+      <fileMode>755</fileMode>
+    </fileSet>
+
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/bin</outputDirectory>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+</assembly>
+

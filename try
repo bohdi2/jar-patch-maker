@@ -1,0 +1,11 @@
+#!/bin/sh
+
+docker run \
+  -it --rm \
+  --name foo \
+  --add-host maven-dev-repo.us.icap.com:172.16.12.28 \
+  -v "$PWD":/usr/src/my \
+  -v /home/chelck/.m2:/root/.m2 \
+  -w /usr/src/my chelck/maven:latest ls /home
+
+

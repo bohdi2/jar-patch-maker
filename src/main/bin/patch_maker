@@ -1,0 +1,7 @@
+#!/bin/sh
+
+ROOT=`dirname $0`
+CLASSPATH=`ls $ROOT/*.jar | paste -s -d":" -`
+EJAR=`echo $ROOT/jarpatch*jar`
+
+java -cp $CLASSPATH -jar $EJAR "$@"
