@@ -11,7 +11,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "commons-cli" % "commons-cli" % "1.2",
+  "commons-cli" % "commons-cli" % "1.3.1",
   "joda-time" % "joda-time" % "1.6",
   "junit" % "junit" % "3.8.2" % "test",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test"
