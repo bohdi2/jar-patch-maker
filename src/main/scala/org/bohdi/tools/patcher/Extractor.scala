@@ -1,16 +1,15 @@
 package org.bohdi.tools.patcher
 
-import java.io.File
-import java.util.jar.JarFile
-import scala.util.matching.Regex
 
-class Extractor(pattern: Regex) {
+class Extractor(regex: String) {
+/*
+  def getChanges(config: Config): Seq[Entry] = {
+    val oldEntries = getEntries(config.oldJars)
+    val newEntries = getEntries(config.newJars)
 
-  def getChanges(oldFilenames: Seq[File], newFilenames: Seq[File]): Seq[Entry] = {
-    val e1 = getEntries(oldFilenames)
-    val e2 = getEntries(newFilenames)
+    val newKeys = newEntries.keySet -- oldEntries.keySet
 
-    e2.keySet.diff(e1.keySet).flatMap(hash => e2.get(hash)).toSeq
+    newKeys.map(newEntries(_)).toSeq
   }
 
   private def getEntries(filenames: Seq[File]): Map[String, Entry] = {
@@ -18,22 +17,21 @@ class Extractor(pattern: Regex) {
 
     for (filename <- filenames) {
       System.out.println("Extracting: " + filename)
-      val jarFile = new JarFile(filename)
-      import scala.collection.JavaConversions._
+      val jar = new Jar(filename)
+      val classEntries = jar.filter(_.getName matches regex)
 
-      val jarEntries = enumerationAsScalaIterator(jarFile.entries)
+      val hashes = for {
+        entry <- classEntries
+      } yield (hash(jar, entry), entry)
 
-      for (jarEntry <- jarEntries) {
-        jarEntry.getName match {
-          case pattern(_*) =>
-            val hash = Sha1.calculateHash(jarFile.getInputStream(jarEntry))
-            result = result.updated(hash, Entry.create(jarFile, jarEntry))
-
-          case _ =>
-        }
-      }
-      jarFile.close()
+      //result = result ++ hashes
     }
+
     result
   }
+
+  private def hash(jar: Jar, entry: JarEntry): Option[String] = {
+    jar.withEntryStream(entry.getName())(_.map(Sha1.calculateHash(_)))
+  }
+  */
 }

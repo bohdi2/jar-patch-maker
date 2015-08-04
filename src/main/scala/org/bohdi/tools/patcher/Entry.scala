@@ -1,24 +1,38 @@
 package org.bohdi.tools.patcher
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
+import java.io._
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import collection.JavaConversions.enumerationAsScalaIterator
 
-object Entry {
-  def create(jarFile: JarFile, jarEntry: JarEntry): Entry = {
-    val byteStream: ByteArrayOutputStream = new ByteArrayOutputStream
-    IoUtil.copy(jarFile.getInputStream(jarEntry), byteStream)
-    byteStream.close()
+case class Id(jarFile: JarFile, jarEntry: JarEntry) {
+  def inputStream = jarFile.getInputStream(jarEntry)
 
-    new Entry(jarEntry, byteStream.toByteArray)
+  def sha1 = Sha1.calculateHash(inputStream)
+
+  def name = jarEntry.getName
+
+  def hash = s"$name/$sha1"
+}
+
+object Jars {
+
+  def load(files: Seq[File]): Map[String, Id]= {
+    val ids = for {
+      file <- files
+      jarFile = new JarFile(file)
+      entry <- jarFile.entries()
+      id = Id(jarFile, entry)
+    } yield id.hash -> id
+
+  ids.toMap
   }
 }
 
-class Entry(jarEntry: JarEntry, bytes: Array[Byte]) {
 
-  def getJarEntry: JarEntry = jarEntry
 
-  def getInputStream: InputStream = new ByteArrayInputStream(bytes)
-}
+
+
+
+
+
