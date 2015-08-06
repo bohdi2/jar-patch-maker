@@ -7,6 +7,12 @@ import java.util.jar.{Attributes, JarOutputStream, Manifest}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
+case class Config(patch: File = new File("."),
+                  oldJars: Seq[File] = Seq(),
+                  newJars: Seq[File] = Seq(),
+                  name: String = "",
+                  baseVersion: String = "",
+                  patchVersion: String = "")
 
 object CreatePatchFile {
   private val IMPLEMENTATION_PATCH: Attributes.Name = new Attributes.Name("Implementation-Patch")
@@ -21,12 +27,12 @@ object CreatePatchFile {
       } text "out is a required file property"
 
 
-      opt[Seq[File]]('o', "old") valueName "<jar1>,<jar2>..." action { (x, c) =>
-        c.copy(oldJars = x)
+      opt[Seq[File]]('o', "old") valueName "<jar1> <jar2>..." unbounded() optional() action { (x, c) =>
+        c.copy(oldJars = c.oldJars ++: x)
       } text "old jars to include"
 
-      opt[Seq[File]]('n', "new") valueName "<jar1>,<jar2>..." action { (x, c) =>
-        c.copy(newJars = x)
+      opt[Seq[File]]('n', "new") valueName "<jar1>,<jar2>..." unbounded() action { (x, c) =>
+        c.copy(newJars = c.newJars ++: x)
       } text "new jars to include"
 
     }
