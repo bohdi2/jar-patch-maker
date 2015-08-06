@@ -34,7 +34,6 @@ object CreatePatchFile {
     // parser.parse returns Option[C]
     parser.parse(args, Config()) match {
       case Some(config) =>
-        //val extractor = new Extractor(".*\\.class$")
         createPatch(config, createManifest(config))
 
       case None =>
@@ -44,7 +43,6 @@ object CreatePatchFile {
   }
 
   private def createManifest(config: Config): Manifest = {
-    println("createManifest")
     val fmt = DateTimeFormat.forPattern("MMMM dd yyyy")
     val today = fmt.print(new DateTime)
     val manifest = new Manifest
@@ -63,32 +61,21 @@ object CreatePatchFile {
   }
 
   def createPatch(config: Config, manifest: Manifest) {
-    println("createPatch: " + config.patch)
     val oldIds = Jars.load(config.oldJars)
     val newIds = Jars.load(config.newJars)
 
     config.patch.createNewFile()
-    val jos = new JarOutputStream(new FileOutputStream(config.patch))
+    val jos = new JarOutputStream(new FileOutputStream(config.patch), manifest)
 
-    val foo = newIds.keySet diff oldIds.keySet
-    val patchIds = newIds.filterKeys(foo.contains)
+    val changedHashes = newIds.keySet diff oldIds.keySet
+    val patchIds = newIds.filterKeys(changedHashes.contains)
 
-    println(s"oldIs: ${oldIds.size}")
-    //println(s"oldIs: ${oldIds.keySet}")
-
-    println(s"newIs: ${newIds.size}")
-    //println(s"newIs: ${newIds.keySet}")
-
-    println(s"foo: ${foo.size}")
-
-    println(s"patchIs: ${patchIds.size}")
-
+    println(s"Old: ${oldIds.size}, new: ${newIds.size}, Patched: ${patchIds.size}")
 
     for (id <- patchIds.values) {
+      println(s"Including ${id.name}")
       jos.putNextEntry(id.jarEntry)
-      val is = id.inputStream
-      transfer(is, jos)
-
+      transfer(id.inputStream, jos)
     }
 
     jos.close()

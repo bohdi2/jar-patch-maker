@@ -18,11 +18,15 @@ case class Id(jarFile: JarFile, jarEntry: JarEntry) {
 object Jars {
 
   def load(files: Seq[File]): Map[String, Id]= {
+
+    val excludes = Set("META-INF/MANIFEST.MF")
+
     val ids = for {
       file <- files
       jarFile = new JarFile(file)
       entry <- jarFile.entries()
       id = Id(jarFile, entry)
+      if ! excludes.contains(id.name)
     } yield id.hash -> id
 
   ids.toMap
