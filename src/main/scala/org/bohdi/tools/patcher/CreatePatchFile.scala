@@ -7,40 +7,18 @@ import java.util.jar.{Attributes, JarOutputStream, Manifest}
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
-case class Config(patch: File = new File("."),
-                  oldJars: Seq[File] = Seq(),
-                  newJars: Seq[File] = Seq(),
-                  name: String = "",
-                  baseVersion: String = "",
-                  patchVersion: String = "")
+
 
 object CreatePatchFile {
   private val IMPLEMENTATION_PATCH: Attributes.Name = new Attributes.Name("Implementation-Patch")
 
   def main(args: Array[String]) {
 
-    val parser = new scopt.OptionParser[Config]("scopt") {
-      head("scopt", "3.x")
+    val parser = CommandLineParser0
 
-      opt[File]('p', "patch") required() valueName "<file>" action { (x, c) =>
-        c.copy(patch = x)
-      } text "out is a required file property"
-
-
-      opt[Seq[File]]('o', "old") valueName "<jar1> <jar2>..." unbounded() optional() action { (x, c) =>
-        c.copy(oldJars = c.oldJars ++: x)
-      } text "old jars to include"
-
-      opt[Seq[File]]('n', "new") valueName "<jar1>,<jar2>..." unbounded() action { (x, c) =>
-        c.copy(newJars = c.newJars ++: x)
-      } text "new jars to include"
-
-    }
-
-    // parser.parse returns Option[C]
-    parser.parse(args, Config()) match {
-      case Some(config) =>
-        createPatch(config, createManifest(config))
+    parser.parse(args) match {
+      case Some(arguments) =>
+        createPatch(arguments, createManifest(arguments))
 
       case None =>
       // arguments are bad, error message will have been displayed
@@ -48,30 +26,30 @@ object CreatePatchFile {
 
   }
 
-  private def createManifest(config: Config): Manifest = {
+  private def createManifest(arguments: Arguments): Manifest = {
     val fmt = DateTimeFormat.forPattern("MMMM dd yyyy")
     val today = fmt.print(new DateTime)
     val manifest = new Manifest
     var attributes = manifest.getMainAttributes
     attributes.put(MANIFEST_VERSION, "1.0")
     attributes = new Attributes
-    attributes.put(IMPLEMENTATION_PATCH, config.patchVersion)
-    attributes.put(IMPLEMENTATION_TITLE, config.name)
+    attributes.put(IMPLEMENTATION_PATCH, arguments.patchVersion)
+    attributes.put(IMPLEMENTATION_TITLE, arguments.name)
     attributes.put(IMPLEMENTATION_VENDOR, "ICAP Development")
-    attributes.put(IMPLEMENTATION_VERSION, config.name + " " + config.baseVersion + " " + today)
-    attributes.put(SPECIFICATION_TITLE, config.name + " Patch")
+    attributes.put(IMPLEMENTATION_VERSION, arguments.name + " " + arguments.baseVersion + " " + today)
+    attributes.put(SPECIFICATION_TITLE, arguments.name + " Patch")
     attributes.put(SPECIFICATION_VENDOR, "ICAP")
-    attributes.put(SPECIFICATION_VERSION, config.baseVersion)
+    attributes.put(SPECIFICATION_VERSION, arguments.baseVersion)
     manifest.getEntries.put("BrokerNet", attributes)
     manifest
   }
 
-  def createPatch(config: Config, manifest: Manifest) {
-    val oldIds = Jars.load(config.oldJars)
-    val newIds = Jars.load(config.newJars)
+  def createPatch(arguments: Arguments, manifest: Manifest) {
+    val oldIds = Jars.load(arguments.oldJars)
+    val newIds = Jars.load(arguments.newJars)
 
-    config.patch.createNewFile()
-    val jos = new JarOutputStream(new FileOutputStream(config.patch), manifest)
+    new File(arguments.patch).createNewFile()
+    val jos = new JarOutputStream(new FileOutputStream(arguments.patch), manifest)
 
     val changedHashes = newIds.keySet diff oldIds.keySet
     val patchIds = newIds.filterKeys(changedHashes.contains)

@@ -17,7 +17,7 @@ case class Id(jarFile: JarFile, jarEntry: JarEntry) {
 
 object Jars {
 
-  def load(files: Seq[File]): Map[String, Id]= {
+  def load(files: Seq[String]): Map[String, Id]= {
 
     val excludes = Set("META-INF/MANIFEST.MF")
 
